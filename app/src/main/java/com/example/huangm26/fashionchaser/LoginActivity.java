@@ -75,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         tx1.setVisibility(View.GONE);
 
 
+        
 //        login_button.setOnClickListener(new View.OnClickListener(){
 //            public void onClick(View v){
 //                Intent intent = new Intent("com.example.huangm26.fashionchaser.FashionOptions");

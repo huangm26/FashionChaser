@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">FashionChaser</string>
     <string name="Login">Login</string>
+    <string name="Temperature">Temperature</string>
+    <string name="Condition">Condition</string>
+    <string name="Location">Location</string>
 </resources>

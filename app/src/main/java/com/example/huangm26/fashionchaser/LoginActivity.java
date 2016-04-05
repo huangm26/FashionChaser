@@ -1,6 +1,7 @@
 package com.example.huangm26.fashionchaser;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -71,6 +73,18 @@ public class LoginActivity extends AppCompatActivity {
         signup_button=(Button)findViewById(R.id.signup);
         tx1=(TextView)findViewById(R.id.textView3);
         tx1.setVisibility(View.GONE);
+
+
+//        login_button.setOnClickListener(new View.OnClickListener(){
+//            public void onClick(View v){
+//                Intent intent = new Intent("com.example.huangm26.fashionchaser.FashionOptions");
+//                startActivity(intent);
+//            }
+//        });
+
+
+
+
 
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,5 +194,6 @@ public class LoginActivity extends AppCompatActivity {
             Log.d("Finished execution", "Fished");
         }
     }
+
 
 }

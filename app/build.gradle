@@ -34,4 +34,5 @@ dependencies {
     compile 'com.amazonaws:aws-android-sdk-kinesis:2.+'
     compile 'com.amazonaws:aws-android-sdk-machinelearning:2.+'
     compile 'com.amazonaws:aws-android-sdk-sns:2.+'
+    compile 'com.amazonaws:aws-android-sdk-ddb-mapper:2.+'
 }

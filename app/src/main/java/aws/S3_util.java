@@ -2,6 +2,7 @@ package aws;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 
 import com.amazonaws.AmazonClientException;
@@ -17,13 +18,14 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.GetBucketLocationRequest;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 
 import java.io.File;
 
 /**
  * Created by huangm26 on 3/29/16.
  */
-public class S3_util  extends AsyncTask<Void, Void, Void> {
+public class S3_util {
 
     Context context = null;
     CognitoCachingCredentialsProvider credentialsProvider = null;
@@ -44,15 +46,14 @@ public class S3_util  extends AsyncTask<Void, Void, Void> {
             Log.d("Invalid context: ", "Invalid context, please use the correct constructor");
             return;
         }
-//        Bucket bucket = s3.createBucket(bucket_name);
+        CreateBucketJob job = new CreateBucketJob(s3, bucket_name);
+        job.execute();
 
 
     }
 
 
-
-
-    public void uploadToS3(String bucket, File file, String object_key)
+    public void uploadToS3(String bucket, String filename, String object_key)
     {
         //error check
         if (context == null) {
@@ -60,68 +61,152 @@ public class S3_util  extends AsyncTask<Void, Void, Void> {
             return;
         }
 
-        TransferUtility transferUtility = new TransferUtility(s3, context);
-
-
-        TransferObserver observer = transferUtility.upload(
-                bucket,     /* The bucket to upload to */
-                object_key,    /* The key for the uploaded object */
-                file        /* The file where the data to upload exists */
-        );
-
-        observer.setTransferListener(new TransferListener(){
-
-            @Override
-            public void onStateChanged(int id, TransferState state) {
-                // do something
-                Log.d("State changed", "state changed");
-            }
-
-            @Override
-            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-                int percentage = (int) (bytesCurrent/bytesTotal * 100);
-                //Display percentage transfered to user
-                Log.d("The current percentage", Integer.toString(percentage));
-            }
-
-            @Override
-            public void onError(int id, Exception ex) {
-                // do something
-            }
-
-        });
+        File file = new File(Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                + "/" + filename);
+        UploadJob job = new UploadJob(context, file, s3);
+        job.execute();
     }
 
-    @Override
-    protected Void doInBackground(Void... params) {
-        try {
-            String bucketLocation = s3.getBucketLocation(new GetBucketLocationRequest("fashionchaser"));
-            Log.d("location","bucket location = " + bucketLocation);
-        } catch (AmazonServiceException ase) {
-            System.out.println("Caught an AmazonServiceException, which " +
-                    "means your request made it " +
-                    "to Amazon S3, but was rejected with an error response" +
-                    " for some reason.");
-            System.out.println("Error Message:    " + ase.getMessage());
-            System.out.println("HTTP Status Code: " + ase.getStatusCode());
-            System.out.println("AWS Error Code:   " + ase.getErrorCode());
-            System.out.println("Error Type:       " + ase.getErrorType());
-            System.out.println("Request ID:       " + ase.getRequestId());
-        } catch (AmazonClientException ace) {
-            System.out.println("Caught an AmazonClientException, which " +
-                    "means the client encountered " +
-                    "an internal error while trying to " +
-                    "communicate with S3, " +
-                    "such as not being able to access the network.");
-            System.out.println("Error Message: " + ace.getMessage());
+    private class CreateBucketJob extends AsyncTask<Void, Void, Void> {
+
+        AmazonS3 s3 = null;
+        String bucketName;
+        public CreateBucketJob(AmazonS3 s3, String bucketname)
+        {
+            this.s3 = s3;
+            this.bucketName = bucketname;
         }
-        return null;
+        @Override
+        protected Void doInBackground(Void... params) {
+            // do above Server call here
+
+            Bucket bucket = s3.createBucket(bucketName);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // execution of result of Long time consuming operation
+            Log.d("Finished execution", "Create bucket Fished");
+        }
     }
 
-    @Override
-    protected void onPostExecute(Void result) {
-        super.onPostExecute(result);
-        // execution of result of Long time consuming operation
-        Log.d("Finished execution", "Fished");
+    private class UploadJob extends AsyncTask<Void, Void, Void> {
+
+        Context context = null;
+        AmazonS3 s3 = null;
+        File file = null;
+        public UploadJob(Context context, File file, AmazonS3 s3)
+        {
+            this.context = context;
+            this.file = file;
+            this.s3 = s3;
+        }
+        @Override
+        protected Void doInBackground(Void... params) {
+            // do above Server call here
+            TransferUtility transferUtility = new TransferUtility(s3, context);
+
+//            s3.putObject(new PutObjectRequest("fashionchaser", "test.txt", file));
+            TransferObserver observer = transferUtility.upload(
+                    "fashionchaser",     /* The bucket to upload to */
+                    "test.txt",    /* The key for the uploaded object */
+                    file        /* The file where the data to upload exists */
+            );
+
+            observer.setTransferListener(new TransferListener() {
+
+                @Override
+                public void onStateChanged(int id, TransferState state) {
+                    // do something
+                    Log.d("State changed", "state changed");
+                }
+
+                @Override
+                public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                    int percentage = (int) (bytesCurrent / bytesTotal * 100);
+                    //Display percentage transfered to user
+                    Log.d("The current percentage", Integer.toString(percentage));
+                }
+
+                @Override
+                public void onError(int id, Exception ex) {
+                    // do something
+                    Log.d("Error", "Error");
+                }
+
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // execution of result of Long time consuming operation
+            Log.d("Finished execution", "Upload to S3 Fished");
+        }
+    }
+
+    private class Download extends AsyncTask<Void, Void, Void> {
+
+        Context context = null;
+        CognitoCachingCredentialsProvider credentialsProvider = null;
+        AmazonS3 s3 = null;
+        File file = null;
+        public Download(Context context, File file)
+        {
+            this.context = context;
+            this.file = file;
+        }
+        @Override
+        protected Void doInBackground(Void... params) {
+            // do above Server call here
+            Cognito_credential new_credential = new Cognito_credential(context);
+            credentialsProvider = new_credential.getCognitoCredential();
+            s3 = new AmazonS3Client(credentialsProvider);
+            s3.setRegion(Region.getRegion(Regions.US_WEST_1));
+            TransferUtility transferUtility = new TransferUtility(s3, context);
+
+
+//            s3.putObject(new PutObjectRequest("fashionchaser", "test.txt", file));
+            TransferObserver observer = transferUtility.download(
+                    "fashionchaser",     /* The bucket to download from*/
+                    "test.txt",    /* The key for the download object */
+                    file        /* The file where the data to download  */
+            );
+
+            observer.setTransferListener(new TransferListener() {
+
+                @Override
+                public void onStateChanged(int id, TransferState state) {
+                    // do something
+                    Log.d("State changed", "state changed");
+                }
+
+                @Override
+                public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                    int percentage = (int) (bytesCurrent / bytesTotal * 100);
+                    //Display percentage transfered to user
+                    Log.d("The current percentage", Integer.toString(percentage));
+                }
+
+                @Override
+                public void onError(int id, Exception ex) {
+                    // do something
+                    Log.d("Error", "Error");
+                }
+
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // execution of result of Long time consuming operation
+            Log.d("Finished execution", "Download from S3 Fished");
+        }
     }
 }

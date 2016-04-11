@@ -2,12 +2,16 @@ package aws;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.*;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.*;
 import com.amazonaws.services.dynamodbv2.model.*;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutionException;
 
 
@@ -58,6 +62,7 @@ public class DynamoDB_util {
         else
             return false;
     }
+
 
 
     private class UploadJob extends AsyncTask<Void, Void, Void>

@@ -10,6 +10,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import aws.DynamoDB_util;
 
@@ -41,12 +44,13 @@ public class LoginActivity extends AppCompatActivity {
         tx1=(TextView)findViewById(R.id.textView3);
         tx1.setVisibility(View.GONE);
 
+
         login_button.setOnClickListener(new View.OnClickListener() {
-            @Override
             public void onClick(View v) {
-                if (verifyUser(usernameText.getText().toString(),passwordText.getText().toString())) {
+                String hash_password = hashPassword(passwordText.getText().toString());
+                if (verifyUser(usernameText.getText().toString(),hash_password)) {
                     Toast.makeText(getApplicationContext(), "Redirecting...", Toast.LENGTH_SHORT).show();
-                    Intent goToWeather = new Intent(getApplicationContext(), WeatherActivity.class);
+                    Intent goToWeather = new Intent(getApplicationContext(), OptionMenuActivity.class);
                     startActivity(goToWeather);
 
                 } else {
@@ -73,11 +77,12 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Plese enter a valid username", Toast.LENGTH_SHORT).show();
                 } else {
                     String temp_password = passwordText.getText().toString();
+                    String hash_password = hashPassword(temp_password);
                     if (temp_password.equals("")) {
                         Toast.makeText(getApplicationContext(), "Please enter a valid password", Toast.LENGTH_SHORT).show();
                     } else {
                         my_username = temp_username;
-                        my_password = temp_password;
+                        my_password = hash_password;
                         signUpNewUser(my_username,my_password);
                     }
                 }
@@ -117,6 +122,24 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Successful login", Toast.LENGTH_SHORT).show();
         else
             Toast.makeText(getApplicationContext(), "Please enter a valid password", Toast.LENGTH_SHORT).show();
+    }
+
+
+    private String hashPassword(String password) {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        try {
+            md.update(password.getBytes("UTF-8")); // Change this to "UTF-16" if needed
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        byte[] digest = md.digest();
+        String hash = new String(digest);
+        return hash;
     }
 
 }

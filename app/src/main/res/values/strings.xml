@@ -5,19 +5,34 @@
     <string name="Condition">Condition</string>
     <string name="Location">Location</string>
     <string name="select_clothing_style">Select Clothing Style</string>
-    <string-array name="clothing_style_names">
-        <item>Activewear</item>
+    <string-array name="options">
+        <item>Top</item>
+        <item>Bottom</item>
+        <item>Footwear</item>
+    </string-array>
+    <string-array name="top">
         <item>Blazers</item>
         <item>Coats</item>
         <item>Jackets</item>
         <item>Hoodies</item>
         <item>Sweaters</item>
         <item>T-shirts</item>
+        <item>Suits</item>
+        <item>Polos</item>
+    </string-array>
+    <string-array name="bottom">
         <item>Jeans</item>
         <item>Pants</item>
         <item>Shorts</item>
-        <item>Suits</item>
-        <item>Swimwear</item>
-        <item>Polos</item>
+        <item>Trousers</item>
     </string-array>
+    <string-array name="footwear">
+        <item>Sneakers</item>
+        <item>Boots</item>
+        <item>Dress Shoes</item>
+        <item>Sandals</item>
+    </string-array>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_option_menu">OptionMenuActivity</string>
+    <string name="title_activity_insert_new_clothes">InsertNewClothes</string>
 </resources>

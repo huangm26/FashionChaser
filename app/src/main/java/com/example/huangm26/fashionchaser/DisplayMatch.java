@@ -3,10 +3,12 @@ package com.example.huangm26.fashionchaser;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +17,22 @@ import com.example.huangm26.fashionchaser.data.Channel;
 import com.example.huangm26.fashionchaser.data.Item;
 import com.example.huangm26.fashionchaser.service.WeatherServiceCallback;
 import com.example.huangm26.fashionchaser.service.YahooWeatherService;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.*;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class DisplayMatch extends AppCompatActivity implements WeatherServiceCallback, View.OnClickListener{
 
@@ -44,6 +62,7 @@ public class DisplayMatch extends AppCompatActivity implements WeatherServiceCal
         cameraButton.setOnClickListener(this);
     }
 
+
     @Override
     public void serviceSuccess(Channel channel) {
         dialog.hide();
@@ -51,6 +70,42 @@ public class DisplayMatch extends AppCompatActivity implements WeatherServiceCal
         temperatureTextView.setText(item.getCondition().getTemperature() + "\u00B0" + channel.getUnits().getTemperature());
         conditionTextView.setText(item.getCondition().getDescription());
         locationTextView.setText(service.getLocation());
+    }
+
+    public void sendMessage(View view) {
+
+        TextView txtView = (TextView) findViewById(R.id.textView1);
+
+        new CallMashapeAsync().execute();
+    }
+
+    private class CallMashapeAsync extends AsyncTask<String, Integer, HttpResponse<JsonNode>> {
+
+        protected HttpResponse<JsonNode> doInBackground(String... msg) {
+            HttpResponse<JsonNode> response = null;
+            try {
+                 response = Unirest.post("https://apicloud-colortag.p.mashape.com/tag-file.json")
+                        .header("X-Mashape-Key", "Pn2jrLshIhmshRO1hb2wa5Fc7ZSxp1NFGQqjsnm3HlMlNVayTl")
+                        .field("image", new File("18-04-2016_visvim_104cmykjacket_navy_sh_1x.jpg"))
+                        .field("palette", "w3c")
+                        .field("sort", "relevance")
+                        .asJson();
+            } catch (UnirestException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            return response;
+        }
+
+        protected void onProgressUpdate(Integer...integers) {
+        }
+
+        protected void onPostExecute(HttpResponse<JsonNode> response) {
+            String answer = response.getBody().toString();
+            TextView txtView = (TextView) findViewById(R.id.textView1);
+            txtView.setText(answer);
+        }
     }
 
     @Override

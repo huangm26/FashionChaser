@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
-
+    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.example.huangm26.fashionchaser"
         minSdkVersion 21
@@ -35,4 +35,5 @@ dependencies {
     compile 'com.amazonaws:aws-android-sdk-machinelearning:2.+'
     compile 'com.amazonaws:aws-android-sdk-sns:2.+'
     compile 'com.amazonaws:aws-android-sdk-ddb-mapper:2.+'
+    compile files('libs/unirest-java-1.4.10-SNAPSHOT-withDependency-ShadedForAndroid.jar')
 }

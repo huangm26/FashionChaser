@@ -30,12 +30,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/Color"
+        android:id="@+id/textView1"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_below="@+id/cameraButton" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/Temperature"
         android:id="@+id/temperatureTextView"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_below="@+id/cameraButton"
-        android:layout_marginTop="50dp"/>
+        android:layout_below="@+id/textView1" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -10,21 +10,19 @@
     tools:context="com.example.huangm26.fashionchaser.DisplayMatch">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/displayPicture"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/displayTop"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/cameraButton"
-        android:background="@drawable/camera"
-        android:layout_alignParentTop="true"
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/displayBottom"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/displayPicture"
-        android:layout_marginTop="250dp" />
+        android:layout_below="@+id/displayTop"/>
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -34,7 +32,7 @@
         android:id="@+id/textView1"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_below="@+id/cameraButton" />
+        android:layout_below="@+id/displayBottom" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,6 +59,13 @@
         android:layout_below="@+id/conditionTextView"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Exit"
+        android:id="@+id/exit"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
 
 
 

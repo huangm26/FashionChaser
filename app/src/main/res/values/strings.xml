@@ -33,6 +33,16 @@
         <item>Dress Shoes</item>
         <item>Sandals</item>
     </string-array>
+    <string-array name="colorOptions">
+        <item>Red</item>
+        <item>Green</item>
+        <item>Blue</item>
+        <item>Black</item>
+        <item>White</item>
+        <item>Yellow</item>
+        <item>Purple</item>
+        <item>Brown</item>
+    </string-array>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_option_menu">OptionMenuActivity</string>
     <string name="title_activity_insert_new_clothes">InsertNewClothes</string>

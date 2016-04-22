@@ -3,9 +3,12 @@ package com.example.huangm26.fashionchaser;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,6 +33,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,8 +62,21 @@ public class DisplayMatch extends AppCompatActivity implements WeatherServiceCal
         dialog.show();
 
         service.refreshWeather("New York City, NY");
-        Button cameraButton = (Button) findViewById(R.id.cameraButton);
-        cameraButton.setOnClickListener(this);
+
+        Button exitButton = (Button) findViewById(R.id.exit);
+        exitButton.setOnClickListener(this);
+        Uri fileUri = Uri.fromFile(new File("/storage/emulated/0/Pictures/MyCameraApp/IMG_20160422_110352.jpg"));
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), fileUri);
+            ImageView topView = (ImageView) findViewById(R.id.displayTop);
+            topView.setImageBitmap(bitmap);
+            ImageView bottomView = (ImageView) findViewById(R.id.displayBottom);
+            bottomView.setImageBitmap(bitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -116,10 +133,9 @@ public class DisplayMatch extends AppCompatActivity implements WeatherServiceCal
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
-            case R.id.cameraButton:
-                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, 0);
+        switch (v.getId()){
+            case R.id.exit:
+                finish();
                 break;
         }
     }

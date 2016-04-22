@@ -42,6 +42,8 @@
         <item>Yellow</item>
         <item>Purple</item>
         <item>Brown</item>
+        <item>Gray</item>
+        <item>Orange</item>
     </string-array>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_option_menu">OptionMenuActivity</string>

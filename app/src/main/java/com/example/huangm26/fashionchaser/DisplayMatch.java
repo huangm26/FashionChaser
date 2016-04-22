@@ -31,6 +31,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.*;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,41 +92,7 @@ public class DisplayMatch extends AppCompatActivity implements WeatherServiceCal
         locationTextView.setText(service.getLocation());
     }
 
-    public void sendMessage(View view) {
 
-        TextView txtView = (TextView) findViewById(R.id.textView1);
-
-        new CallMashapeAsync().execute();
-    }
-
-    private class CallMashapeAsync extends AsyncTask<String, Integer, HttpResponse<JsonNode>> {
-
-        protected HttpResponse<JsonNode> doInBackground(String... msg) {
-            HttpResponse<JsonNode> response = null;
-            try {
-                 response = Unirest.post("https://apicloud-colortag.p.mashape.com/tag-file.json")
-                        .header("X-Mashape-Key", "Pn2jrLshIhmshRO1hb2wa5Fc7ZSxp1NFGQqjsnm3HlMlNVayTl")
-                        .field("image", new File("18-04-2016_visvim_104cmykjacket_navy_sh_1x.jpg"))
-                        .field("palette", "w3c")
-                        .field("sort", "relevance")
-                        .asJson();
-            } catch (UnirestException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-            return response;
-        }
-
-        protected void onProgressUpdate(Integer...integers) {
-        }
-
-        protected void onPostExecute(HttpResponse<JsonNode> response) {
-            String answer = response.getBody().toString();
-            TextView txtView = (TextView) findViewById(R.id.textView1);
-            txtView.setText(answer);
-        }
-    }
 
     @Override
     public void serviceFailure(Exception exception) {

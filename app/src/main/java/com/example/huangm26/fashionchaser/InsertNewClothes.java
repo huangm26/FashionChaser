@@ -12,16 +12,20 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
+import com.example.huangm26.fashionchaser.data.DetectColor;
+import com.example.huangm26.fashionchaser.data.DetectColorComplete;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class InsertNewClothes extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class InsertNewClothes extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener, DetectColorComplete {
     Spinner first_spinner;
     Spinner second_spinner;
     Spinner third_spinner;
@@ -32,7 +36,8 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
     public static final int MEDIA_TYPE_VIDEO = 2;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 200;
-
+    private static File imagePath = null;
+    String color;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,6 +122,7 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), fileUri);
                     ImageView iv = (ImageView) findViewById(R.id.displayPicture);
                     iv.setImageBitmap(bitmap);
+                    detectColor();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -141,9 +147,19 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
 
     }
 
+    private void detectColor()
+    {
+        DetectColor colorDetector = new DetectColor(imagePath);
+        colorDetector.delegate = this;
+        colorDetector.execute();
+//        String color = colorDetector.returnColor();
+//        Log.d("Color is :", color);
+    }
+
     /** Create a file Uri for saving an image or video */
     private static Uri getOutputMediaFileUri(int type){
-        return Uri.fromFile(getOutputMediaFile(type));
+        imagePath = getOutputMediaFile(type);
+        return Uri.fromFile(imagePath);
     }
 
 
@@ -179,5 +195,45 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
         }
 
         return mediaFile;
+    }
+
+
+    @Override
+    public void processFinish(String output) {
+        color = output;
+        Log.d("Color is ", color);
+        if(color.toLowerCase().contains("Red".toLowerCase()))
+            color = "Red";
+        else if(color.toLowerCase().contains("Green".toLowerCase()))
+            color = "Green";
+        else if(color.toLowerCase().contains("Blue".toLowerCase()))
+            color = "Blue";
+        else if(color.toLowerCase().contains("Black".toLowerCase()))
+            color = "Black";
+        else if(color.toLowerCase().contains("White".toLowerCase()))
+            color = "White";
+        else if(color.toLowerCase().contains("Yellow".toLowerCase()))
+            color = "Yellow";
+        else if(color.toLowerCase().contains("Purple".toLowerCase()))
+            color = "Purple";
+        else if(color.toLowerCase().contains("Brown".toLowerCase()))
+            color = "Brown";
+        else if(color.toLowerCase().contains("Gray".toLowerCase()))
+            color = "Gray";
+        else
+            color = "Orange";
+        setSpinner(third_spinner,color);
+    }
+
+
+    private void setSpinner(Spinner spinner, String value)
+    {
+        for(int i=0; i < spinner.getCount(); i++) {
+            if(spinner.getItemAtPosition(i).equals(value))
+            {
+                spinner.setSelection(i);
+                break;
+            }
+        }
     }
 }

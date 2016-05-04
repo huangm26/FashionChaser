@@ -21,6 +21,9 @@ android {
     packagingOptions {
         exclude 'com/amazonaws/services/machinelearning/request.handler2s'
     }
+    repositories {
+        mavenCentral()
+    }
 }
 
 dependencies {
@@ -36,4 +39,10 @@ dependencies {
     compile 'com.amazonaws:aws-android-sdk-sns:2.+'
     compile 'com.amazonaws:aws-android-sdk-ddb-mapper:2.+'
     compile files('libs/unirest-java-1.4.10-SNAPSHOT-withDependency-ShadedForAndroid.jar')
+    compile 'com.google.apis:google-api-services-prediction:v1.6-rev60-1.21.0'
+    compile 'com.google.apis:google-api-services-oauth2:v1-rev112-1.21.0'
+    compile 'com.google.api-client:google-api-client:1.20.0'
+    compile 'com.google.apis:google-api-services-sqladmin:v1beta4-rev23-1.21.0'
+    compile 'com.google.http-client:google-http-client-android:1.21.0'
+    compile 'com.google.apis:google-api-services-storage:v1-rev71-1.21.0'
 }

@@ -16,6 +16,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.services.machinelearning.AmazonMachineLearningClient;
+import com.amazonaws.services.machinelearning.model.EntityStatus;
+import com.amazonaws.services.machinelearning.model.GetMLModelRequest;
+import com.amazonaws.services.machinelearning.model.GetMLModelResult;
+import com.amazonaws.services.machinelearning.model.PredictRequest;
+import com.amazonaws.services.machinelearning.model.PredictResult;
+import com.amazonaws.services.machinelearning.model.RealtimeEndpointStatus;
 import com.example.huangm26.fashionchaser.data.Channel;
 import com.example.huangm26.fashionchaser.data.Item;
 import com.example.huangm26.fashionchaser.service.WeatherServiceCallback;
@@ -38,7 +46,13 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import aws.Cognito_credential;
+import aws.MachineLearning_util;
+import google.Predict_util;
 
 
 public class DisplayMatch extends AppCompatActivity implements WeatherServiceCallback, View.OnClickListener{
@@ -67,7 +81,9 @@ public class DisplayMatch extends AppCompatActivity implements WeatherServiceCal
         service.refreshWeather("New York City, NY");
 
         Button exitButton = (Button) findViewById(R.id.exit);
+        Button displayButton = (Button) findViewById(R.id.display);
         exitButton.setOnClickListener(this);
+        displayButton.setOnClickListener(this);
         Uri fileUri = Uri.fromFile(new File("/storage/emulated/0/Pictures/MyCameraApp/IMG_20160422_110352.jpg"));
         Bitmap bitmap = null;
         try {
@@ -79,6 +95,7 @@ public class DisplayMatch extends AppCompatActivity implements WeatherServiceCal
         } catch (IOException e) {
             e.printStackTrace();
         }
+
 
     }
 
@@ -103,11 +120,26 @@ public class DisplayMatch extends AppCompatActivity implements WeatherServiceCal
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            case R.id.display:
+                displayClothes();
+                break;
             case R.id.exit:
                 finish();
                 break;
         }
     }
+
+    private void displayClothes() {
+//        MachineLearning_util predict_ml = new MachineLearning_util(getApplicationContext());
+//        predict_ml.makeRequest();
+        Predict_util predict_ml = new Predict_util();
+        try {
+            predict_ml.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // TODO Auto-generated method stub

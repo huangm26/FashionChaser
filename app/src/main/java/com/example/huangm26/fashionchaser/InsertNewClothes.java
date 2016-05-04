@@ -17,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.example.huangm26.fashionchaser.data.Clothes;
 import com.example.huangm26.fashionchaser.data.DetectColor;
 import com.example.huangm26.fashionchaser.data.DetectColorComplete;
 
@@ -38,6 +39,7 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
     private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 200;
     private static File imagePath = null;
     String color;
+    String colorValue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +57,9 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
 
         Button cameraButton = (Button) findViewById(R.id.cameraButton);
         cameraButton.setOnClickListener(this);
+
+        Button insertButton = (Button) findViewById(R.id.insertNew);
+        insertButton.setOnClickListener(this);
 
         Button exitButton = (Button) findViewById(R.id.exit);
         exitButton.setOnClickListener(this);
@@ -98,6 +103,9 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
 //                Log.d("File uri", fileUri.toString());
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
                 startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                break;
+            case R.id.insertNew:
+                Clothes newClothes = new Clothes();
                 break;
             case R.id.exit:
                 finish();
@@ -198,9 +206,22 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
     }
 
 
+
+    private void setSpinner(Spinner spinner, String value)
+    {
+        for(int i=0; i < spinner.getCount(); i++) {
+            if(spinner.getItemAtPosition(i).equals(value))
+            {
+                spinner.setSelection(i);
+                break;
+            }
+        }
+    }
+
     @Override
-    public void processFinish(String output) {
-        color = output;
+    public void processFinish(String color, String colorValue) {
+        this.color = color;
+        this.colorValue = colorValue;
         Log.d("Color is ", color);
         if(color.toLowerCase().contains("Red".toLowerCase()))
             color = "Red";
@@ -223,17 +244,6 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
         else
             color = "Orange";
         setSpinner(third_spinner,color);
-    }
 
-
-    private void setSpinner(Spinner spinner, String value)
-    {
-        for(int i=0; i < spinner.getCount(); i++) {
-            if(spinner.getItemAtPosition(i).equals(value))
-            {
-                spinner.setSelection(i);
-                break;
-            }
-        }
     }
 }

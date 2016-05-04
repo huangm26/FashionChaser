@@ -21,6 +21,7 @@ public class DetectColor extends AsyncTask<String, Integer, HttpResponse<JsonNod
 
     File imagePath = null;
     String color = null;
+    String colorValue = null;
     public DetectColorComplete delegate = null;
     public DetectColor(File imagePath)
     {
@@ -62,6 +63,7 @@ public class DetectColor extends AsyncTask<String, Integer, HttpResponse<JsonNod
             if(jsonarray.length()>0){
                 JSONObject jsonObject = jsonarray.getJSONObject(1);
                 color = jsonObject.getString("label");
+                colorValue = jsonObject.getString("color");
 //                Log.d("Color is ", color);
 
             }
@@ -69,7 +71,7 @@ public class DetectColor extends AsyncTask<String, Integer, HttpResponse<JsonNod
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        delegate.processFinish(color);
+        delegate.processFinish(color, colorValue);
     }
 
 }

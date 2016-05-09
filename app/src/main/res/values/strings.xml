@@ -20,6 +20,7 @@
         <item>T-shirts</item>
         <item>Suits</item>
         <item>Polos</item>
+        <item>Shirt</item>
     </string-array>
     <string-array name="bottom">
         <item>Jeans</item>

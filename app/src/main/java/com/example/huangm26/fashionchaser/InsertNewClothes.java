@@ -1,8 +1,10 @@
 package com.example.huangm26.fashionchaser;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import aws.Clothes_items;
+import aws.DynamoDB_util;
+
 public class InsertNewClothes extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener, DetectColorComplete {
     Spinner first_spinner;
     Spinner second_spinner;
@@ -40,6 +45,10 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
     private static File imagePath = null;
     String color;
     String colorValue;
+    String style;
+    String username;
+    String first_spinner_select = "nothing";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,30 +72,42 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
 
         Button exitButton = (Button) findViewById(R.id.exit);
         exitButton.setOnClickListener(this);
+        setUsername();
     }
 
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (first_spinner.getSelectedItem().equals("Top")) {
-            Toast.makeText(getApplicationContext(), "Top is choosen",
-                    Toast.LENGTH_SHORT).show();
+        if(first_spinner.getSelectedItem().equals(first_spinner_select)) {
+            if(second_spinner != null)
+                this.style = second_spinner.getSelectedItem().toString();
+            if(third_spinner != null)
+                this.color = third_spinner.getSelectedItem().toString();
+            return;
+        }
+        else
+            first_spinner_select = (String) first_spinner.getSelectedItem();
 
-            ArrayAdapter adapter2 = ArrayAdapter.createFromResource(this, R.array.top, android.R.layout.simple_spinner_item);
+        if (first_spinner.getSelectedItem().equals("Top")) {
+            ArrayAdapter adapter2 = ArrayAdapter.createFromResource(this,
+                    R.array.top, android.R.layout.simple_spinner_item);
+            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             second_spinner.setAdapter(adapter2);
+            second_spinner.setOnItemSelectedListener(this);
         } else if (first_spinner.getSelectedItem().equals("Bottom")){
-            Toast.makeText(getApplicationContext(), "Bottom is choosen",
-                    Toast.LENGTH_SHORT).show();
             ArrayAdapter adapter2 = ArrayAdapter.createFromResource(this,
                     R.array.bottom, android.R.layout.simple_spinner_item);
+            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             second_spinner.setAdapter(adapter2);
+            second_spinner.setOnItemSelectedListener(this);
         } else
         {
-            Toast.makeText(getApplicationContext(), "Footwear is choosen",
-                Toast.LENGTH_SHORT).show();
             ArrayAdapter adapter2 = ArrayAdapter.createFromResource(this,
                     R.array.footwear, android.R.layout.simple_spinner_item);
+            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             second_spinner.setAdapter(adapter2);
-
+            second_spinner.setOnItemSelectedListener(this);
         }
+        this.style = second_spinner.getSelectedItem().toString();
+        this.color = third_spinner.getSelectedItem().toString();
     }
 
     @Override
@@ -98,14 +119,10 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.cameraButton:
-                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a file to save the image
-//                Log.d("File uri", fileUri.toString());
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
-                startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                startCamera();
                 break;
             case R.id.insertNew:
-                Clothes newClothes = new Clothes();
+                insertClothes();
                 break;
             case R.id.exit:
                 finish();
@@ -114,6 +131,14 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
 
     }
 
+    private void startCamera() {
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a file to save the image
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+        startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    /** Save the image from camera, and display it on the image view **/
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        // TODO Auto-generated method stub
 //        super.onActivityResult(requestCode, resultCode, data);
@@ -123,17 +148,10 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
                 Toast.makeText(this, "Image saved to:\n" +
                         fileUri.toString(), Toast.LENGTH_LONG).show();
                 Log.d("file URI",fileUri.toString());
-//                Bitmap bp = (Bitmap) data.getExtras().get("data");
-//                ImageView iv = (ImageView) findViewById(R.id.displayPicture);
-//                iv.setImageBitmap(bp);
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), fileUri);
-                    ImageView iv = (ImageView) findViewById(R.id.displayPicture);
-                    iv.setImageBitmap(bitmap);
-                    detectColor();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+                DisplayPicture job = new DisplayPicture(fileUri, this.getContentResolver(), (ImageView) findViewById(R.id.displayPicture));
+                job.execute();
+                detectColor();
             } else if (resultCode == RESULT_CANCELED) {
                 // User cancelled the image capture
             } else {
@@ -155,14 +173,6 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
 
     }
 
-    private void detectColor()
-    {
-        DetectColor colorDetector = new DetectColor(imagePath);
-        colorDetector.delegate = this;
-        colorDetector.execute();
-//        String color = colorDetector.returnColor();
-//        Log.d("Color is :", color);
-    }
 
     /** Create a file Uri for saving an image or video */
     private static Uri getOutputMediaFileUri(int type){
@@ -206,7 +216,7 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
     }
 
 
-
+    /** Auto-adjust the spinner according to the color detected **/
     private void setSpinner(Spinner spinner, String value)
     {
         for(int i=0; i < spinner.getCount(); i++) {
@@ -218,32 +228,92 @@ public class InsertNewClothes extends AppCompatActivity implements View.OnClickL
         }
     }
 
+
+    /** Detect the dominant color in the image, use for auto-color recognization **/
+    private void detectColor()
+    {
+        DetectColor colorDetector = new DetectColor(imagePath);
+        colorDetector.delegate = this;
+        colorDetector.execute();
+//        String color = colorDetector.returnColor();
+//        Log.d("Color is :", color);
+    }
+
     @Override
     public void processFinish(String color, String colorValue) {
         this.color = color;
         this.colorValue = colorValue;
         Log.d("Color is ", color);
         if(color.toLowerCase().contains("Red".toLowerCase()))
-            color = "Red";
+            this.color = "Red";
         else if(color.toLowerCase().contains("Green".toLowerCase()))
-            color = "Green";
+            this.color = "Green";
         else if(color.toLowerCase().contains("Blue".toLowerCase()))
-            color = "Blue";
+            this.color = "Blue";
         else if(color.toLowerCase().contains("Black".toLowerCase()))
-            color = "Black";
+            this.color = "Black";
         else if(color.toLowerCase().contains("White".toLowerCase()))
-            color = "White";
+            this.color = "White";
         else if(color.toLowerCase().contains("Yellow".toLowerCase()))
-            color = "Yellow";
+            this.color = "Yellow";
         else if(color.toLowerCase().contains("Purple".toLowerCase()))
-            color = "Purple";
+            this.color = "Purple";
         else if(color.toLowerCase().contains("Brown".toLowerCase()))
-            color = "Brown";
+            this.color = "Brown";
         else if(color.toLowerCase().contains("Gray".toLowerCase()))
-            color = "Gray";
+            this.color = "Gray";
         else
-            color = "Orange";
-        setSpinner(third_spinner,color);
+            this.color = "Orange";
+        setSpinner(third_spinner,this.color);
 
+    }
+
+    /** get the username from the intent **/
+    private void setUsername() {
+        Bundle extra = getIntent().getExtras();
+        if(extra != null) {
+            username = extra.getString("username");
+        }
+    }
+
+    /** Insert the new clothes to the dynamodb **/
+    private void insertClothes() {
+        if(fileUri == null)
+            return;
+        Clothes_items clothes = new Clothes_items();
+        clothes.setColor(color);
+        clothes.setColorValue(colorValue);
+        clothes.setUsername(username);
+        clothes.setClothesStyle(style);
+        clothes.setFileuri(fileUri.toString());
+        DynamoDB_util myDB_util = new DynamoDB_util(getApplicationContext());
+        myDB_util.uploadClothes(clothes);
+    }
+
+    /** set the image view with the corresponding picture from the uri **/
+    private class DisplayPicture extends AsyncTask<Void, Void, Bitmap> {
+        Uri fileUri;
+        ContentResolver resolver;
+        ImageView view;
+        public DisplayPicture(Uri fileUri, ContentResolver resolver, ImageView view) {
+            this.fileUri = fileUri;
+            this.resolver = resolver;
+            this.view = view;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(resolver, fileUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bitmap;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            view.setImageBitmap(result);
+        }
     }
 }

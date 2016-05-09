@@ -80,16 +80,22 @@ public class Predict_util {
                 .build();
     }
 
-    public void run() throws Exception {
-        MakeRequest newRequest = new MakeRequest();
-        newRequest.execute();
+    public String run(String topColor, String bottomColor) throws Exception {
+        MakeRequest newRequest = new MakeRequest(topColor, bottomColor);
+        return newRequest.execute().get();
     }
 
 
-    private class MakeRequest extends AsyncTask<Void, Void, Void> {
+    private class MakeRequest extends AsyncTask<Void, Void, String> {
+        String topColor;
+        String bottomColor;
+        public MakeRequest(String topColor, String bottomColor) {
+            this.topColor = topColor;
+            this.bottomColor = bottomColor;
+        }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
             httpTransport =  AndroidHttp.newCompatibleTransport();
             // authorization
             GoogleCredential credential = null;
@@ -106,18 +112,19 @@ public class Predict_util {
 //                e.printStackTrace();
 //            }
             List entry = new ArrayList();
-            entry.add("0x345678");
-            entry.add("0x987654");
+            entry.add(topColor);
+            entry.add(bottomColor);
+            String output = "False";
             try {
-                predict(prediction, entry);
+                output = predict(prediction, entry);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return null;
+            return output;
         }
     }
 
-    private static void train(Prediction prediction) throws IOException {
+    private void train(Prediction prediction) throws IOException {
         Insert trainingData = new Insert();
         trainingData.setId(MODEL_ID);
         trainingData.setStorageDataLocation(STORAGE_DATA_LOCATION);
@@ -159,19 +166,20 @@ public class Predict_util {
         error("ERROR: training not completed.");
     }
 
-    private static void error(String errorMessage) {
+    private void error(String errorMessage) {
         System.err.println();
         System.err.println(errorMessage);
         System.exit(1);
     }
 
-    private static void predict(Prediction prediction, List entry) throws IOException {
+    private String predict(Prediction prediction, List entry) throws IOException {
         Input input = new Input();
         Input.InputInput inputInput = new Input.InputInput();
         inputInput.setCsvInstance(entry);
         input.setInput(inputInput);
         Output output = prediction.trainedmodels().predict(PROJECT_ID, MODEL_ID, input).execute();
         Log.d("Predict output", output.getOutputLabel());
+        return output.getOutputLabel();
     }
 
 

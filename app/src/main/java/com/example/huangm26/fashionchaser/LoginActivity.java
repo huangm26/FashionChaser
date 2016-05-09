@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,8 +51,9 @@ public class LoginActivity extends AppCompatActivity {
                 String hash_password = hashPassword(passwordText.getText().toString());
                 if (verifyUser(usernameText.getText().toString(),hash_password)) {
                     Toast.makeText(getApplicationContext(), "Redirecting...", Toast.LENGTH_SHORT).show();
-                    Intent goToWeather = new Intent(getApplicationContext(), OptionMenuActivity.class);
-                    startActivity(goToWeather);
+                    Intent goToOption = new Intent(getApplicationContext(), OptionMenuActivity.class);
+                    goToOption.putExtra("username",usernameText.getText().toString());
+                    startActivity(goToOption);
 
                 } else {
                     //incorrect password
@@ -94,13 +96,13 @@ public class LoginActivity extends AppCompatActivity {
 
     private void signUpNewUser(String username, String password)
     {
-        DynamoDB_util myDB_util = new DynamoDB_util(getApplicationContext(),"Users");
+        DynamoDB_util myDB_util = new DynamoDB_util(getApplicationContext());
         myDB_util.uploadUser(username, password);
     }
 
     private boolean verifyUser(String username, String password)
     {
-        DynamoDB_util myDB_util = new DynamoDB_util(getApplicationContext(),"Users");
+        DynamoDB_util myDB_util = new DynamoDB_util(getApplicationContext());
         Boolean result = myDB_util.verifyUser(username, password);
         if(result) {
 //            Toast.makeText(getApplicationContext(), "Successful login", Toast.LENGTH_SHORT).show();
@@ -115,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
     private void testAws(String username, String password){
 //        S3_util myS3_util = new S3_util(getApplicationContext());
 //        myS3_util.uploadToS3("fashionchaser","test.txt","test.txt");
-        DynamoDB_util myDB_util = new DynamoDB_util(getApplicationContext(),"Users");
+        DynamoDB_util myDB_util = new DynamoDB_util(getApplicationContext());
 //        myDB_util.uploadUser("aaa", "aaa");
         Boolean result = myDB_util.verifyUser(username, password);
         if(result)

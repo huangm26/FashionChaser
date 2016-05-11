@@ -1,0 +1,11 @@
+Running instruction: 
+The APP should be able to run on this source code. Compile and run on an android device with sdk 23 or above.
+For the google Prediction API part, there is a secret .p12 keyfile, which is not included here. To reproduce the machine learningn part,
+please build your own model and obtain your own .p12 file, and modify the google/Predict_util file credential part. If wants to use the original prediciton
+api, please consult the author.
+
+
+Contribution:
+Meng Huang: User login part, combining information in insert new item and store to DB part. The display match part (The machine learning prediction and style prediction), building website.
+Qi Xin: Machine learning training data gathering. Insert new item UI design. Part of the insert new item activity, fetching input color and style information.
+Luyao Huang: Weather information gathering. Insertion clothes color detection part. Part of the display match activity. Building website.
